@@ -1,0 +1,23 @@
+# 本地验证台（无头 Chrome 驱动脚本，不随仓库分发）
+_dev/
+
+# 无头浏览器临时产物
+_profile_*/
+drv_*/
+_chrome*.log
+_shot_*.png
+_*.json
+_drv*.html
+_shot*.html
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 依赖与构建缓存（如需自行重新打包，见 README「重新打包」）
+node_modules/
+dist/
+*.log
