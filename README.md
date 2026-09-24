@@ -1,144 +1,143 @@
-# 照片世界 · Photo World
+# Photo World · 照片世界
 
-把一个文件夹的照片变成可以自由飞行的 3D 照片世界。**双击 `index.html` 就能用**，不需要安装任何东西，照片全程不离开你的电脑。
+[中文](README.zh-CN.md) | **English**
 
-> 想完全离线（含立体视图与手势控制）请用本地服务打开：`python -m http.server 8000` 后访问 `http://localhost:8000`。双击 `file://` 打开时，仅这两项功能需要联网下载一次模型（之后浏览器缓存），详见「打开方式」。
+Turn a folder of photos into a flyable 3D photo world. **Double-click `index.html` to run** — no installation, no server, and your photos never leave your computer.
 
-V10.16：**演示照片进首屏 + 修一个主题切换覆盖 bug** —— ① 空库时的首屏内容从"抽象占位卡"升级为 **18 张免版权真实照片**（Unsplash，横竖比例各异、彩色与黑白混排，见 `samples/` 与 `samples/CREDITS.md`）；加载是异步的：占位卡先立即出现，演示照片就绪后再无缝替换，**已有真实照片时完全不受影响**；`samples/` 缺失或加载失败自动回落占位卡。② **修 bug**：`applyTheme` 里残留着"切主题重建示例卡"的旧逻辑（当年占位卡配色分主题），会把演示照片整体冲回占位卡 —— 已删除；占位卡调色板现为单一中调色，与主题无关。③ 移除仓库内的 `预览/` 截图集（57 张，多为无头环境渲染的占位卡版本，不适合当门面），仓库体积 105MB → 约 92MB。
-V10.15：**首屏可读性修复 + 开源就绪** —— ① **首屏占位卡重做**：旧版是 `#ebebef` 浅灰卡画在白底 `#f5f5f7` 上、再叠一层白雾，首次打开几乎看不到照片（观感像"一片空白"）；现改为**中调石墨卡 + 琥珀编号 + 内侧细线 + 6 组低饱和色调轮转**，白域对比度约 1.1 → **6.79**、夜域 2.54，两域都清晰可辨且保持雾中纵深渐隐；纯程序化生成（Canvas 绘制），零素材零版权。② **开源就绪**：新增 MIT `LICENSE` 与 `.gitignore`；移出 8.6MB 已废弃天空素材（V10.4/V10.8 后引用数为 0，项目体积 130MB → 105MB）；本地验证台脚本归档至 `_dev/`（已 gitignore，不随仓库分发）；README 全面校正（模板数量 8→9、入口位置、无损画质说明、离线边界、第三方许可证清单）+ 新增「打开方式」对照表。
-V5：白域 / 夜域双主题、地面接触阴影、雾随布局分层、品牌开场动画。
-V6：立体视图 —— AI 景深把照片撑成 2.5D 曲面，人物从背景中浮出，移动鼠标环视回到拍摄现场。
-V10.14：**设置中心（标签页）+ 界面精简** —— ① 所有设置收进一个「⚙ 设置」面板，分四个标签页：**外观**（空间切换 / 白域·夜域底色 + 取色器 / 雾感 / 星空密度 / 银河亮度 / 照片尺寸 / 相框 + 相框宽度）、**排布**（9 种模板列表 + 间距档位与滑杆）、**交互**（**完整快捷键表** 16 行 + 纯净模式 / 自动漫游 / 手势控制开关 + 待机屏保时间滑杆）、**数据**（照片数 / 配置导出与**粘贴导入** / 恢复默认 / 清空照片）。② **界面精简**：删掉左下角那三行快捷键长文（挪进设置），右下角按钮从 6 个减到 2 个（⚙ 设置 + 添加照片），独立的「排布模板」面板并入设置（左上按钮/品牌卡点开直接到「排布」页），右上角 `白域·云海` 标签也可点着切主题。③ 新增 `H` 键开关设置、`Esc` 关面板；数字键 1-9 切模板后自动收起面板。实测：面板四页切换正常、点模板即切换并收起、H/Esc/✕ 关闭、数据页计数与 JSON 导出正确、粘贴 `{fadeK:3.2,cardK:1.4,frame:"white",bgLight:"#eef1f5"}` 一键复刻、待机滑杆 7 分钟 → 420 秒、主题按钮与标签联动 —— 全程 0 报错。
-V10.13：**滑杆化自定义（拉杆）** —— 6 个连续参数全部改成拉杆（琥珀色圆点、跟随主题取色、左右端点有文字标注）：相框宽度 0.2~2.5×、照片尺寸 0.5~2.2×、淡入淡出 0.4~6×、雾感 0.2~2.4×、星空密度 0~2.5×（实时显示星点总数）、银河亮度 0~2.5×；两个空间底色除预设色板外，新增**任意取色器**（HTML color picker，想要什么色都行）；模板面板的「间距」也加了 0.6~1.9× 拉杆（拖动即转手动档，与自动/紧凑/标准/舒展四个快捷档并存）。拖动即时改数值、重活（点云重建 / 世界重排）防抖 140ms，松手弹一条确认提示。实测：淡入淡出 4.5× → 远端可见距离 2523；照片尺寸 1.8× → 照片宽 8.82；星空 2.2× → 36,172 颗；取色器 #1a1030 即时生效；间距 1.75× → 晶格 33.25。
-V10.12：**全量自定义（DIY 面板 ⚙）** —— 一切都可调，全部即时生效并存本机，可一键复制配置 JSON 分享（开源友好）。① **相框**：无 / 细线 / 白边 / 胶片 / 留白 五种预设 + **自定义上传**（带透明中心的 PNG 最佳，前置分层不挡照片）+ 相框宽度三档；② **照片尺寸**：小 / 标准 / 大 / 特大；③ **淡入淡出距离**：标准 / 远 / **远（默认）** / 更远 / 极远 —— 默认已比原来更远，实测 30 张在「极远」下全部可见（近端 136.9 → 290.8，远端 369.3 → 1481）；④ **两个空间底色**：白域 / 夜域各 6 组色板（含深色系），地面色按底自动推算；⑤ **雾感**：通透 / 标准 / 朦胧（实测雾密度 0.0063 / 0.0105 / 0.0168）；⑥ **星空密度**：稀疏 / 标准 / 繁密（点云重建，实测 7,360 / 16,396 / 29,112 颗）；⑦ **银河亮度**：淡 / 标准 / 浓。另有「恢复默认」与「复制配置」。
-V10.11：**间距自动调节 + 手动档位** —— 排布模板面板底部新增「间距」控制：**自动**（按照片数量自适应：≤12 张 1.45×、≤40 张 1.18×、≤120 张 1.0×、更多自动收紧）/ 紧凑 0.85× / 标准 1.15× / 舒展 1.45×，GAP·晶格·面板纵深统一由系数驱动，选择持久化到本机。实测最紧档 0.85× 仍零重叠。
-V10.10：**全量体检 + 修复 3 个真 bug** —— ① **观看状态残留**（切布局 / 清空 / 换照片时不会退出「观看照片」，导致新布局完全不生效、相机被钉在观看位、照片墙拖拽与滚轮缩放全失灵、待机屏保永不触发）→ `applyLayout` 与 `clearWorld` 现在先退出观看、退出待机，并加了索引越界防呆；② **左上角模板面板点不到**（品牌卡与按钮长得一样容易点错死区；且面板固定高 489px，矮窗口下后几个模板被切到屏幕外）→ 两块卡片都可点开面板、面板加 `max-height:calc(100vh-190px)` + 滚动、按钮加 hover/按压反馈、品牌卡加一行"▾ 点这里…"提示；③ **观看信息条常驻**（`#focusbar` 基础样式漏了 `opacity:0;visibility:hidden`，没观看照片时也显示在屏幕底部，一排 ‹ ⤢ ◐ ✦ ✕ 加两个"—"占位符）→ 补上默认隐藏。体检覆盖：9 种布局（零重叠 / 零 NaN）、4 种布局下的聚焦摆正（四边倾角 0.000°）、极端比例照片（3:1 / 1:4 / 40px）、记忆卡片（文字保存 + 角标）、照片墙拖拽与缩放边界、快速连切 5 种布局压力测试、待机进入与唤醒、纯净模式叠加观看、清空后重建、无损导入 / 去重 / 损坏文件报错 —— 全程 0 报错。
-V10.8：**纯净白域 + 模块化信息 + 纯净模式** —— ① 白域删除云海贴图，改为纯净底色（+ 地台 + 雾），画面只剩照片（夜域程序化星空不变）；② 左上角品牌文字独立成玻璃面板模块（与「排布模板」按钮同款卡片、两块独立堆叠，模板面板位置随之下移，不再重叠）；③ 新增**纯净模式**（右下按钮 / 快捷键 `P` 进入，`P` 或 `Esc` 退出）：所有界面元素（四角 HUD / 模板按钮与面板 / 观看信息条 / 提示条 / 手势小窗）一起退场，只留展示画面，进入时给一条 2.6s 的操作提示。实测 8 个界面元素同步 hidden/0，退出后完整恢复。
-V10.7：**HEIC 解码三级容错 + 精确定位失败原因** —— ① **文件头嗅探**（不信扩展名和 MIME：微信/QQ/网盘传过的文件常被改名或丢 MIME，HEIF 家族 heic/heix/hevc/heim/heis/mif1/msf1 全部识别）；② **三级解码链**：本地 libheif（wasm，质量 1.0）→ 浏览器原生解码（救回"其实是 JPEG 却叫 .HEIC"的文件、系统带 HEVC 解码器的情况）→ `<img>` 兜底，全失败才报错；③ **失败不再含糊**：提示里直接给出失败文件名 + 真实原因（如 ERR_LIBHEIF format not supported）+ iPhone「兼容性最佳」设置建议；④ 选择器允许 `.heic/.heif/.hif/.heics`，扩展名补 `hif/heics`；⑤ 纹理上限同时兜住 48MP 级超大图（上限 4096，避免显存爆掉）。
-V10.6：**无损画质 + 严格摆正 + 间距再加大** —— ① **无损上传**：取消"40 张以内压到 1600px"的降采样（4032×3024 原图现在原分辨率进纹理）、入库不再重编码 JPEG 85%（存原始文件字节，HEIC 用 1.0 质量解码）、各向异性拉满；实测 3000×2000 原图纹理 3000×2000、入库字节与文件字节完全一致。② **聚焦严格摆正**：改用布局目标姿态计算相机（旧版用"带悬停倾斜的当前姿态"，照片弹回正直后残留约 6~9° 倾角）——实测上下边水平、左右边垂直，倾角 0.000°。③ 间距：晶格 15→**19**、展墙缝隙 5.5→**7.5**、面板纵深 42、隧道 +6.5、总览后退系数再压小 —— 最小边缘间隙 7.25→**9.48**。
-V10.5：**宇宙无边界 + 间距再加大** —— 夜域彻底删除地台（淡出到 0）并修复星野分布（原公式只覆盖上半球，南极无星），星空现在上下左右四面环绕、银河大圆穿天、流星可在任意高度划过；地台平面放大到 4200（远超星空球半径），白域不再有地平线硬边。间距：晶格 10.4→**15**、展墙缝隙 3.4→**5.5**、面板纵深 24→34、隧道两壁 +5.0，并且**总览机位不再等比后退**（散布后退系数 1.72→1.18、展墙 0.72→0.58）——实测自由散布最小边缘间隙 1.6→**7.25**（空气量 4.5 倍），终于"看得见"了。
-V10.4：**程序化真星空** —— 移除全部贴图（ESO 银河穹顶 / 银河带照片下线），夜域改为纯 3D 点云宇宙：三层星野共 7,360 颗按真实星等与色温分布（白蓝为主 + 少量橙红巨星，亮星层强闪烁），银河 = 9,000 颗星尘沿银道面密布（银心方向更密更暖、经向成团、Great Rift 尘埃裂隙）+ 90 点连续雾状银心辉光；全部点位带深度差，飞行时有真实视差——星星在周围而不是"贴布"。零外部请求、零加载等待。
-V10.3：**间距与呼吸感** —— 全布局照片间距加大 40%~100%（散布晶格 7.4→10.4 / 展墙缝隙 1.7→3.4 / 面板纵深 15→24 / 隧道两壁更开阔）· **距离淡入淡出**（近处照片完全不透明，随距离平滑渐隐至消失，阈值随布局尺寸自适应；飞近即淡入，配合雾形成纵深消失感）· **地面影子彻底移除**（白域黑影/夜域暗影全部删除，照片悬浮无投影）· **夜域面板文字改白**（修复 button 默认黑字根因，标题/编号纯白，描述提亮）。
-V10.2：**夜域升级为真实宇宙**（历史记录；V10.4 起已改为纯程序化点云星空，**所有贴图已移除**，下方版权说明同时作废） —— ESO 360° 银河全景穹顶铺满整片天穹（银心、尘埃带、两侧真实深空星场），叠加银河特写带与闪烁星点、流星；观看照片时整个天空自动退场，照片零干扰。聚焦照片取消触碰倾斜/浮动，任何情况下都绝对方正。
-V10.1：**照片聚焦摆正**（相机滚转对齐，任何模板下照片都方正朝屏、缩放不变形）· **天空换真实照片**（白域 = 真实云层带，夜域 = ESO 千万像素银河全景）· **HEIC 直传**（iPhone 原格式本地解码，无需联网）· **重复照片自动拦截**（感知哈希 + 灰度二次确认）· 地面黑影更清晰 · 夜域面板文字对比度修复。
-V10：双空间背景（白域云海 / 夜域星空银河，缓慢运动）+ 三大新功能 —— **照片墙**（无限画布 · 拖拽平移）、**记忆卡片**（心情 · 文字 · 录音 · 音视频，全本地）、**待机画面**（慢速漫游 + 那年今日）。
+> For full offline use (including stereoscopic view and gesture control), serve locally: `python -m http.server 8000` then open `http://localhost:8000`. When opened via `file://` double-click, those two features fetch models once online and then cache them. See **How to Open** below.
 
-## 使用
+## Changelog
 
-把照片或整个文件夹**直接拖进窗口**，也可以点右下角「+ 添加照片」或顶部「选择整个文件夹」。首次打开是 30 张占位示例卡，拖入真实照片后自动替换。
+**V10.16**: **Demo photos on first screen + theme-switch bugfix** — ① Empty-library first screen upgraded from abstract placeholder cards to **18 royalty-free real photos** (Unsplash, mixed aspect ratios, color & B&W, see `samples/` and `samples/CREDITS.md`); loading is async: placeholders appear instantly, demo photos swap in seamlessly when ready, **existing user photos are unaffected**; auto-fallback to placeholders if `samples/` is missing or fails. ② **Bugfix**: removed leftover "rebuild demo cards on theme switch" logic in `applyTheme` that was resetting demo photos back to placeholders; placeholder palette is now a single mid-tone, theme-independent. ③ Removed the `预览/` screenshot set from the repo (57 images, mostly headless-rendered placeholder versions), reducing repo size from 105MB to ~92MB.
 
-- **照片自动保存**：导入的照片存进浏览器本地（IndexedDB），下次双击打开自动恢复，刷新不丢。点「清空」可全部删除重来。
-- **9 种排布模板 + 照片墙**（右下「⚙ 设置」→ 排布页，或直接按数字键 1-9）：所有模板都保证照片之间留有缝隙、互不重叠，切换时带交错级联过渡动画，选择会被记住。
-- **双主题**（设置 → 外观 → 「◐ 切换白域 / 夜域」，或点右上角主题标签，或按 M）：**白域**是纯净底色展馆（无贴图，只有照片、地台与雾），**夜域**是程序化宇宙（三层星野按真实星等与色温分布 + 9,000 颗星尘组成的银河带，含银心辉光与尘埃裂隙，全部为 3D 点云、有真实视差）+ 单色琥珀强调；背景、雾、地面、标签、UI 全套颜色平滑过渡，选择会被记住。
-- **iPhone HEIC 直传**：HEIC / HEIF 照片自动在本地解码成 JPG（内置 heic2any，无需联网），直接拖进来即可。HEIC 照片的「拍摄时间」取文件时间，如需精确的「那年今日」建议导出为 JPG。
-- **重复照片自动拦截**：导入时对每张照片计算感知哈希并与已有照片比对，同一张照片（哪怕改了文件名）不会重复进入世界，会提示「已跳过 N 张重复照片」。
-- **手势控制**（按 G，或设置 → 交互）：张手挥动 = 环视，握拳上抬 = 前进 / 下压 = 后退。需要摄像头权限，**首次使用需要联网**加载识别模型（约 8MB，之后浏览器有缓存）。
+**V10.15**: **First-screen readability fix + open-source readiness** — ① **Placeholder card redesign**: old version drew `#ebebef` light-gray cards on `#f5f5f7` white with a white overlay, making photos nearly invisible on first open ("blank page" feel); now uses **mid-tone graphite cards + amber numerals + inner hairline + 6 low-saturation color rotations**, white-domain contrast ~1.1 → **6.79**, night-domain 2.54 — clearly visible in both themes while preserving fog depth fade; purely procedural (Canvas), zero assets, zero copyright. ② **Open-source readiness**: added MIT `LICENSE` and `.gitignore`; removed 8.6MB of deprecated sky assets (zero references after V10.4/V10.8, repo size 130MB → 105MB); local validation scripts archived to `_dev/` (gitignored); README fully corrected + new "How to Open" comparison table.
 
-## V10 三大新功能
+**V5**: Dual white/night themes, ground-contact shadows, layout-aware fog, brand intro animation.
 
-- **照片墙（按 2 切换）**：单面巨墙 · 零重叠的"无限画布"。拖拽直接平移墙面（带惯性滑行），滚轮推拉观看距离，速度快时视角有细微倾斜，飞近照片点击即进入观看。
-- **记忆卡片（观看照片时点 ✦）**：给这张照片写下当时的心情——6 个心情标签、一段文字、麦克风录音、上传音频/视频，自动保存进浏览器本地（IndexedDB），不上传任何服务器。有记忆的照片右上角会亮起金色小圆点。
-- **待机画面**：3 分钟没有任何操作，照片世界进入屏保模式——相机在照片之间缓慢漂移（偏向有记忆的照片），左下角浮现时间日期，飘到有记忆的照片会浮现「那天的你写下：…」。碰一下键盘鼠标即唤醒回到原位。
+**V6**: Stereoscopic view — AI depth estimation turns photos into 2.5D relief, subjects float out from the background; move the mouse to look around and return to the moment the photo was taken.
 
-## 排布模板
+**V10.14–V10.10**: Settings center (4 tabs), slider-based customization, full DIY panel, auto/manual spacing, full QA pass with 3 bugfixes.
 
-| # | 模板 | 效果 |
+**V10.8–V10.3**: Pure white domain (no sky texture), modular info panels, clean mode, HEIC decoding 3-level fallback, lossless image quality, precise focus alignment, increased spacing, infinite starfield.
+
+**V10**: Dual-space backgrounds (white gallery / night starfield) + three major features — **Photo Wall** (infinite canvas · drag to pan), **Memory Cards** (mood · text · recording · audio/video, all local), **Idle Screensaver** (slow drift + on-this-day).
+
+## Usage
+
+Drag photos or an entire folder **directly into the window**, or click the **+ Add Photos** button at bottom-right, or "Select entire folder" at top. First open shows 18 demo photos; importing your own photos automatically replaces them.
+
+- **Photos auto-save**: imported photos are stored in browser local storage (IndexedDB) and restored on next open. Click "Clear" to delete everything and start over.
+- **9 layout templates + Photo Wall** (⚙ Settings → Layout tab, or press keys 1–9): every template guarantees gaps between photos with zero overlap; switching triggers a staggered cascade animation; your choice is remembered.
+- **Dual themes** (Settings → Appearance → "◐ Switch white/night domain", or click the theme label top-right, or press `M`): **White domain** is a pure gallery (no textures — just photos, a subtle ground plane, and fog); **Night domain** is a procedural universe (three star layers by real magnitude & color temperature + 9,000-star Milky Way band with galactic core glow and dust rifts, all 3D point clouds with real parallax) + single amber accent; background, fog, ground, labels, and UI all transition smoothly; your choice is remembered.
+- **iPhone HEIC direct import**: HEIC/HEIF photos are decoded locally to JPG (built-in heic2any, no internet needed) — just drag them in. HEIC photo "taken time" uses file modification time; for precise "on-this-day" matching, export to JPG.
+- **Duplicate auto-blocking**: each imported photo gets a perceptual hash and is compared against existing photos; the same photo (even with a different filename) won't be re-added, and you'll see "Skipped N duplicate photos".
+- **Gesture control** (press `G`, or Settings → Interaction): open hand and wave = look around, make fist and raise = move forward / lower = move back. Requires camera permission; **first use needs internet** to load the hand-tracking model (~8MB, then browser-cached).
+
+## V10 Major Features
+
+- **Photo Wall (press 2)**: a single giant wall · zero-overlap "infinite canvas". Drag to pan the wall (with inertial glide), scroll wheel to push/pull viewing distance, subtle view tilt at high speed; fly close to a photo and click to enter focus view.
+- **Memory Cards (click ✦ while focusing a photo)**: write down how you felt — 6 mood tags, a text note, microphone recording, or upload audio/video. All saved locally in IndexedDB, nothing uploaded. Photos with memories get a glowing amber dot in the top-right corner.
+- **Idle Screensaver**: after 3 minutes of no input, the photo world enters screensaver mode — the camera drifts slowly among photos (favoring photos with memories), time and date fade in at bottom-left, and when drifting past a photo with a memory, "That day you wrote: …" appears. Any keyboard/mouse input wakes it up and returns to your previous position.
+
+## Layout Templates
+
+| # | Template | Effect |
 | --- | --- | --- |
-| 1 | 自由散布 | 照片均匀漂浮在椭球空间里（晶格蓝噪声分布），互不接触 |
-| 2 | 照片墙 | 单面巨墙无限画布 · 拖拽平移 · 滚轮推拉 · 零重叠 |
-| 3 | 矩阵展墙 | 画廊式多面展墙，按照片实际宽度装箱成行，整齐有缝隙 |
-| 4 | 波浪幕墙 | 起伏的波浪墙面，行与行之间错落呼吸 |
-| 5 | 环形剧场 | 照片围成一圈或多圈，站上圆心被照片环绕 |
-| 6 | 螺旋之塔 | 双螺旋盘旋而上，绕塔飞行观看 |
-| 7 | 穹顶星空 | 照片贴在球面内壁，置身正中央被包裹 |
-| 8 | 时光隧道 | 两壁交错展开的纵深走廊，雾更浓、更显幽深 |
-| 9 | 时间星岛 | 按 EXIF 拍摄年月聚成岛屿，沿弧线从旧到新，标签标注年月与张数 |
+| 1 | Free Float | Photos float evenly in an ellipsoid space (blue-noise lattice distribution), no contact |
+| 2 | Photo Wall | Single giant wall, infinite canvas · drag to pan · scroll to push/pull · zero overlap |
+| 3 | Matrix Gallery | Gallery-style multi-panel walls, photos packed into rows by actual width, neat with gaps |
+| 4 | Wave Curtain | Undulating wave surface, rows breathe with staggered offset |
+| 5 | Ring Theater | Photos form one or more concentric rings; stand at the center and be surrounded |
+| 6 | Spiral Tower | Double helix spiraling upward; fly around the tower to view |
+| 7 | Dome Starfield | Photos贴 on the inner surface of a sphere; stand at the center and be enveloped |
+| 8 | Time Tunnel | Two walls staggered into a depth corridor; denser fog for a deep, secluded feel |
+| 9 | Time Islands | Photos clustered by EXIF year-month into islands, arranged along an arc from old to new, labeled with year-month and count |
 
-## 氛围系统
+## Atmosphere System
 
-- **纯净悬浮**：照片不带描边、光晕、背景板，也不投地面阴影（V10.3 起彻底移除），任何角度都是干净的原图呈现
-- **地台**：白域保留极淡地台作为空间基准；夜域无地板 —— 抬头、低头、转身都是星空
-- **距离淡入淡出**：近处照片完全不透明，随距离平滑渐隐并融进背景（配合雾形成纵深消失感）；淡出到看不见的照片不响应悬停与点击
-- **雾随布局分层**：隧道最浓（幽深感）、穹顶最淡（通透感），切换布局时雾密度平滑过渡
-- **开场仪式**：品牌页（标题 + 琥珀线）淡出后，相机从远处缓缓推进到总览机位
-- **暗角**：仅夜域启用，白域保持纯净
+- **Pure floating**: photos have no borders, glows, backplates, and cast no ground shadows (fully removed since V10.3) — clean original-image presentation from any angle
+- **Ground plane**: white domain keeps a very subtle ground plane as spatial reference; night domain has no floor — look up, down, or turn around and it's all stars
+- **Distance fade-in/fade-out**: nearby photos are fully opaque, smoothly fading into the background with distance (combined with fog for depth disappearance); faded-out photos don't respond to hover or click
+- **Layout-aware fog**: densest in Time Tunnel (seclusion feel), lightest in Dome Starfield (transparency); fog density transitions smoothly when switching layouts
+- **Opening ceremony**: after the brand page (title + amber line) fades out, the camera slowly pushes in from afar to the overview position
+- **Vignette**: night domain only; white domain stays pure
 
-## 操作
+## Controls
 
-| 输入 | 效果 |
+| Input | Effect |
 | --- | --- |
-| 拖拽 | 环视（照片墙模式下 = 平移墙面，带惯性） |
-| W A S D | 朝视线方向飞行 |
-| 空格 / C（E / Q） | 上升 / 下降 |
-| 滚轮 | 推进 / 后退（照片墙 = 推拉观看距离；观看照片时 = 调整观看距离） |
-| Shift | 冲刺 |
-| 1-9 | 切换排布模板 |
-| T | 自动漫游 |
-| G | 手势控制开关 |
-| M | 切换 白域 / 夜域 |
-| 触碰照片 | 弹跳动效 |
-| 点击照片 | 飞到它面前，← → 翻页，Esc 或点空白处返回 |
-| 观看中拖拽 | 调整视角环视，不会退出观看 |
-| 观看中 ✦ | 打开这条照片的记忆卡片（心情 / 文字 / 录音 / 音视频） |
-| V（飞近照片后） | 开启 / 关闭立体视图（2.5D 景深 + 人物分层） |
-| 立体视图中 | 拖拽 / 滚轮 / 点照片照常可用；点空白处或按 Esc = 退出立体视图（再点空白才退出观看） |
-| 3 分钟无操作 | 进入待机画面，任意键鼠唤醒 |
+| Drag | Look around (in Photo Wall mode = pan the wall, with inertia) |
+| W A S D | Fly in look direction |
+| Space / C (E / Q) | Ascend / descend |
+| Scroll wheel | Push forward / pull back (Photo Wall = adjust viewing distance; while focusing = adjust focus distance) |
+| Shift | Sprint |
+| 1–9 | Switch layout template |
+| T | Auto-roam toggle |
+| G | Gesture control toggle |
+| M | Switch white / night domain |
+| Hover photo | Bounce animation |
+| Click photo | Fly to it; ← → to flip through photos; Esc or click empty space to return |
+| Drag while focusing | Adjust look angle without exiting focus |
+| ✦ while focusing | Open this photo's memory card (mood / text / recording / media) |
+| V (after flying close) | Toggle stereoscopic view (2.5D depth + subject layering) |
+| In stereoscopic view | Drag / scroll / click photos as usual; click empty space or Esc = exit stereoscopic (click empty space again to exit focus) |
+| 3 min no input | Enter idle screensaver; any keyboard/mouse wakes it |
 
-## 兼容与边界
+## Compatibility & Boundaries
 
-- 推荐 Chrome / Edge；iPhone 的 HEIC / HEIF 已支持直接拖入（本地解码，不用转格式、不用联网）
-- **画质无损**：主流相机/手机原图按原分辨率进纹理（上限取显卡纹理上限 8192），**不做降采样**；入库直接存原始文件字节，不做二次编码。只有数百张的超大相册才按显存分级（>80 张 4096 / >250 张 2560 / >600 张 1920）
-- IndexedDB 在 `file://` 与本地服务下均可用（已实测）；个别环境不支持时应用照常工作，只是不保存
-- **AI 模型已随项目本地化**（`models/` 目录，约 91MB）：立体视图的景深模型（Depth-Anything-V2-Small，26MB）、人物分割模型、手势模型与 onnxruntime / MediaPipe 运行时全部内置，**用本地服务打开即可完全离线使用**
-- ⚠️ **`file://` 双击打开时的两个限制**（浏览器安全策略，非本项目问题）：① 立体视图与手势控制读不到本地模型，会自动回落在线镜像（hf-mirror.com → huggingface.co，下载过一次后浏览器缓存秒开）；② 麦克风录音不可用（文字 / 心情 / 上传音视频不受影响）。**要完整离线体验，请用本地服务方式打开**（见下方「打开方式」）
-- 麦克风录音需要 `http://localhost` 或 `https://` 环境（`file://` 双击打开时录音不可用，文字 / 心情 / 上传音视频不受影响）
-- 页面暴露 `window.PhotoWorld`（`setLayout` / `applyTheme` / `layouts` / `importFiles` / `DB` / `dismissIntro` / `focusCard` / `memOpenFor` / `memDebug` / `wallDebug` / `idleDebug` / `setIdleAfter` 等），方便嵌入作品集与自动化验证
+- Recommended: Chrome / Edge; iPhone HEIC/HEIF supported via direct drag-in (local decoding, no conversion, no internet)
+- **Lossless quality**: mainstream camera/phone originals enter textures at full resolution (GPU texture limit 8192), **no downsampling**; library stores original file bytes directly, no re-encoding. Only very large libraries (>80 photos → 4096, >250 → 2560, >600 → 1920) get tiered by VRAM
+- IndexedDB works under both `file://` and local server (tested); if unavailable in some environments, the app still works — just without persistence
+- **AI models are bundled locally** (`models/` directory, ~91MB): depth model for stereoscopic view (Depth-Anything-V2-Small, 26MB), person segmentation model, hand gesture model, plus onnxruntime / MediaPipe runtimes — **all fully offline when served locally**
+- ⚠️ **Two limitations when opened via `file://` double-click** (browser security policy, not a project issue): ① stereoscopic view and gesture control can't read local models, auto-fallback to online mirror (hf-mirror.com → huggingface.co, downloaded once then cached); ② microphone recording unavailable (text / mood / uploaded media unaffected). **For full offline experience, use local server** (see How to Open)
+- Microphone recording requires `http://localhost` or `https://` (unavailable under `file://` double-click; text / mood / uploaded media unaffected)
+- Page exposes `window.PhotoWorld` (`setLayout` / `applyTheme` / `layouts` / `importFiles` / `DB` / `dismissIntro` / `focusCard` / `memOpenFor` / `memDebug` / `wallDebug` / `idleDebug` / `setIdleAfter` etc.) for embedding in portfolios and automated verification
 
-## 打开方式
+## How to Open
 
-| 方式 | 离线 | 录音 | 说明 |
+| Method | Offline | Recording | Notes |
 | --- | --- | --- | --- |
-| **本地服务**（推荐） | ✅ 完全离线 | ✅ | 在项目目录执行 `python -m http.server 8000`，浏览器打开 `http://localhost:8000` —— 所有 AI 模型本地读取，功能全开 |
-| 双击 `index.html` | ⚠️ 立体视图/手势需联网一次 | ❌ | 最省事，零安装；模型会从在线镜像下载一次后缓存 |
-| 打包成桌面版 | ✅ | ✅ | 用 Electron / Tauri 或 PyInstaller 套壳本地服务，即可得到双击即用的独立程序 |
+| **Local server (recommended)** | ✅ Fully offline | ✅ | Run `python -m http.server 8000` in the project directory, open `http://localhost:8000` — all AI models read locally, all features enabled |
+| Double-click `index.html` | ⚠️ Stereoscopic/gesture need internet once | ❌ | Easiest, zero install; models download once from online mirror then cache |
+| Packaged as desktop app | ✅ | ✅ | Wrap the local server in Electron / Tauri / PyInstaller for a double-click standalone program |
 
-## 开源与许可
+## Open Source & License
 
-- 本项目代码：**MIT**（见 `LICENSE`），可自由使用、修改、商用、再分发
-- 第三方组件与其许可证：
+- Project code: **MIT** (see `LICENSE`), free to use, modify, commercialize, and redistribute
+- Third-party components and their licenses:
 
-| 组件 | 用途 | 许可证 |
+| Component | Purpose | License |
 | --- | --- | --- |
-| [three.js](https://threejs.org) | 3D 渲染 | MIT |
-| [MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe) | 手势识别 / 人物分割 | Apache-2.0 |
-| [Depth-Anything-V2-Small](https://depth-anything-v2.github.io) | 立体视图景深估计 | Apache-2.0（Base/Large/Giant 为 CC-BY-NC-4.0，本项目**未使用**） |
-| [transformers.js](https://github.com/huggingface/transformers.js) | 深度模型运行时 | Apache-2.0 |
-| [onnxruntime-web](https://onnxruntime.ai) | ONNX 推理 | MIT |
-| [heic2any](https://github.com/alexcorvi/heic2any) | HEIC 解码（内含 libheif） | MIT（libheif：LGPL-3.0） |
+| [three.js](https://threejs.org) | 3D rendering | MIT |
+| [MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe) | Hand tracking / person segmentation | Apache-2.0 |
+| [Depth-Anything-V2-Small](https://depth-anything-v2.github.io) | Stereoscopic depth estimation | Apache-2.0 (Base/Large/Giant are CC-BY-NC-4.0, **not used** by this project) |
+| [transformers.js](https://github.com/huggingface/transformers.js) | Depth model runtime | Apache-2.0 |
+| [onnxruntime-web](https://onnxruntime.ai) | ONNX inference | MIT |
+| [heic2any](https://github.com/alexcorvi/heic2any) | HEIC decoding (includes libheif) | MIT (libheif: LGPL-3.0) |
 
-- **首屏内容**：空库时优先加载 `samples/` 下的 18 张**免版权演示照片**（Unsplash / Lorem Picsum，见 `samples/CREDITS.md`）；若该目录缺失或加载失败，自动回落到纯程序化生成的占位卡（Canvas 绘制）。
-  ⚠️ `samples/` 的**照片版权不属于本项目**（不在 MIT 覆盖范围内），只作演示；替换成你自己的照片只需覆盖同名文件
-- 仓库含约 91MB 二进制模型，克隆略慢；如需精简可用 Git LFS，或改用 Release 附件分发
+- **First-screen content**: when the library is empty, the app优先 loads 18 **royalty-free demo photos** from `samples/` (Unsplash / Lorem Picsum, see `samples/CREDITS.md`); if that directory is missing or fails to load, auto-fallback to purely procedural placeholder cards (Canvas-drawn).
+  ⚠️ Photos in `samples/` **are not part of this project's code** and **not covered by MIT** — they're for demo only. To use your own photos, just overwrite the files with the same names.
+- The repo contains ~91MB of binary models, so cloning is somewhat slow; for a slimmer repo you could use Git LFS or distribute models via Release attachments
 
-## 目录
+## Directory Structure
 
 ```
 photo-world/
-├─ index.html   界面与样式（CSS 变量驱动双主题）
-├─ app.js       打包产物（three.js + MediaPipe 已含）
-├─ src/main.js  源码（THEMES / 排布模板 / 相机 / 立体视图 / 深度管线 / 人物分割 / 记忆 / 待机 / 配置系统）
-├─ models/      AI 模型（景深 / 人物分割 / 手势 + onnxruntime 与 MediaPipe 运行时）+ HEIC 解码库（heic2any.min.js）
-├─ samples/     演示照片（18 张，Unsplash 免版权，见 samples/CREDITS.md）+ 加载清单
-└─ _dev/        本地验证台（无头 Chrome 驱动脚本，已在 .gitignore 中排除，不随仓库分发）
+├─ index.html   UI and styles (CSS-variable-driven dual themes)
+├─ app.js       Bundled output (three.js + MediaPipe included)
+├─ src/main.js  Source code (THEMES / layout templates / camera / stereoscopic view / depth pipeline / person segmentation / memory / idle / config system)
+├─ models/      AI models (depth / person segmentation / gesture + onnxruntime & MediaPipe runtimes) + HEIC decoder (heic2any.min.js)
+├─ samples/     Demo photos (18 images, Unsplash royalty-free, see samples/CREDITS.md) + load manifest
+└─ _dev/        Local validation bench (headless Chrome driver scripts, excluded via .gitignore, not distributed)
 ```
 
-## 重新打包（改了 src/main.js 之后）
+## Rebuild (after modifying src/main.js)
 
 ```bash
 cd ~/.workbuddy/binaries/node/workspace
-./node_modules/@esbuild/win32-x64/esbuild.exe <项目>/src/main.js \
+./node_modules/@esbuild/win32-x64/esbuild.exe <project>/src/main.js \
   --bundle --format=iife --minify --target=es2019 --platform=browser \
   --alias:three=./node_modules/three/build/three.module.js \
   --alias:@mediapipe/tasks-vision=./node_modules/@mediapipe/tasks-vision/vision_bundle.mjs \
-  --outfile=<项目>/app.js
+  --outfile=<project>/app.js
 ```
