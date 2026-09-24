@@ -4,6 +4,8 @@
 
 Turn a folder of photos into a flyable 3D photo world. **Double-click `index.html` to run** — no installation, no server, and your photos never leave your computer.
 
+![Photo World demo](demo.gif)
+
 > For full offline use (including stereoscopic view and gesture control), serve locally: `python -m http.server 8000` then open `http://localhost:8000`. When opened via `file://` double-click, those two features fetch models once online and then cache them. See **How to Open** below.
 
 ## Changelog
