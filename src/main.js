@@ -2122,15 +2122,21 @@ function sampleItem(i) {
    比抽象占位卡好看得多 —— 它同时是在线 demo 的门面。
    任何一张加载失败都会被跳过；全部失败（例如分发时裁掉了 samples/）则回落到程序化占位卡。 */
 const DEMO_FILES = Array.from({ length: 18 }, (_, i) => `demo-${String(i + 1).padStart(2, '0')}.jpg`);
+let demoLoading = false;
 let demoMode = false;   /* 首屏当前是演示照片(true) 还是程序化占位卡(false) */
 
 async function loadDemoItems() {
-  const items = [];
-  for (let i = 0; i < DEMO_FILES.length; i++) {
+  const results = await Promise.all(DEMO_FILES.map(async (file, i) => {
     try {
-      const im = await loadImg('samples/' + DEMO_FILES[i]);
+      const im = await new Promise((resolve, reject) => {
+        const image = new Image();
+        const timer = setTimeout(() => { image.onload = image.onerror = null; reject(new Error('demo timeout')); }, 12000);
+        image.onload = () => { clearTimeout(timer); resolve(image); };
+        image.onerror = () => { clearTimeout(timer); reject(new Error('demo decode')); };
+        image.src = 'samples/' + file;
+      });
       const w = im.naturalWidth, h = im.naturalHeight;
-      if (!w || !h) continue;
+      if (!w || !h) return null;
       const cv = document.createElement('canvas');
       cv.width = w; cv.height = h;
       cv.getContext('2d').drawImage(im, 0, 0, w, h);
@@ -2141,17 +2147,19 @@ async function loadDemoItems() {
       tex.magFilter = THREE.LinearFilter;
       tex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
       tex.needsUpdate = true;
-      items.push({ tex, w, h, aspect: w / h, name: `演示 ${i + 1}`, date: 0, sample: true, demo: true });
-    } catch (e) { /* 缺文件跳过 */ }
-  }
-  return items.length >= 6 ? items : null;   /* 太少就当作没有演示素材 */
+      return { tex, w, h, aspect: w / h, name: `演示 ${i + 1}`, date: 0, sample: true, demo: true };
+    } catch (e) { return null; }
+  }));
+  const items = results.filter(Boolean);
+  if (items.length < 6) { items.forEach(item => item.tex.dispose()); return null; }
+  return items;   /* 太少就当作没有演示素材 */
 }
 
 function syncSampleTip() {
   const tip = document.getElementById('tip');
   if (!tip) return;
   const lab = tip.querySelector('.t span');
-  if (lab) lab.textContent = demoMode ? '演示照片' : '占位卡片';
+  if (lab) lab.textContent = demoMode ? '演示照片' : demoLoading ? '正在加载示例照片…' : '占位卡片';
   tip.classList.add('show');
 }
 
@@ -2159,9 +2167,12 @@ function syncSampleTip() {
 async function upgradeToDemo() {
   const onlySamples = () => state.cards.length > 0 && state.cards.every(c => c.userData.item.sample);
   if (!onlySamples()) return;
+  demoLoading = true;
+  syncSampleTip();
   const demo = await loadDemoItems();
-  if (!demo) return;                 /* 没有演示素材 → 保留占位卡 */
-  if (!onlySamples()) return;        /* 等待期间用户已导入 / 恢复了真实照片 → 放弃升级 */
+  demoLoading = false;
+  if (!demo) { if (onlySamples()) syncSampleTip(); return; }                 /* 没有演示素材 → 保留占位卡 */
+  if (!onlySamples()) { demo.forEach(item => item.tex.dispose()); return; } /* 保留用户照片 */
   clearWorld();
   addItems(demo);
   demoMode = true;
@@ -2740,7 +2751,7 @@ function applyTheme(id, opts = {}) {
   try { localStorage.setItem('pw.theme', id); } catch (e) { /* ignore */ }
   document.documentElement.dataset.theme = id;
   const chip = document.getElementById('modeChip');
-  if (chip) chip.textContent = id === 'dark' ? '夜域 · 星河' : '白域 · 云海';
+  if (chip) chip.textContent = id === 'dark' ? '夜域 · 星河' : '白域 · 画廊';
   const spLbl = document.getElementById('cfSpaceNow');
   if (spLbl) spLbl.textContent = id === 'dark' ? '夜域' : '白域';
   const bt = document.getElementById('btnTheme');

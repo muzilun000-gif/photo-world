@@ -1,0 +1,10 @@
+{
+  "name": "photo-world",
+  "version": "10.16.1",
+  "private": true,
+  "type": "module",
+  "scripts": {"build": "node scripts/build.mjs", "check": "node --check src/main.js"},
+  "dependencies": {"three": "0.186.0", "@mediapipe/tasks-vision": "1.0.1"},
+  "devDependencies": {"esbuild": "0.25.12"},
+  "engines": {"node": ">=20"}
+}
